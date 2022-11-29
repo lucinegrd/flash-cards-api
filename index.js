@@ -67,9 +67,7 @@ app.get('/user/connection/:name/:password', (req, res) => {
 
 app.get('/user/:id/name', (req, res)=>{
     const sql = "SELECT name FROM user WHERE user.idUser = ?"
-    console.log(req.params.item, typeof req.params.item)
     db.query(sql, [req.params.item, req.params.id], function(err, result, fields){
-        console.log(fields)
         if (err) throw err;
         res.status(200).json(result);
     })
@@ -157,12 +155,20 @@ app.get('/pack', (req, res) => {
     })
 })
 
+app.get('/pack/:id', (req, res) => {
+    const sql = "SELECT * FROM pack WHERE idPack = ?;";
+    db.query(sql, req.params.id, (err, result) => {
+        if (err) throw err;
+        res.status(200).json(result[0]);
+    })
+})  
+
 
 //RELATION USER PACK
 app.get('/relationuserpack/:idUser/:path', (req, res) => {
     const idUser = mysql.escape(req.params.idUser);
     const path = mysql.escape(req.params.path);
-    const sql = `SELECT r.idPack FROM relationuserpack as r JOIN user ON r.idUser = user.idUser WHERE r.path = ${path} AND r.idUser = ${idUser};`;
+    const sql = `SELECT pack.* FROM pack JOIN relationuserpack as r  ON pack.idPack = r.idPack JOIN user ON r.idUser = user.idUser WHERE r.path = ${path} AND r.idUser = ${idUser};`;
     db.query(sql, (err, result)=>{
         if(err) throw err;
         res.status(200).json(result);
